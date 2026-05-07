@@ -635,14 +635,17 @@ class Solution:
 ```python
 class Solution:
     def setZeroes(self, matrix: List[List[int]]) -> None:
-        m, n = len(matrix), len(matrix[0])
+        m=len(matrix) #行数
+		n=len(matrix[0])#列数
         
         # 检查第一行是否有0
-        first_row_has_zero = any(matrix[0][j] == 0 for j in range(n))
+        first_row_has_zero =0 in matrix[0]
         # 检查第一列是否有0
         first_col_has_zero = any(matrix[i][0] == 0 for i in range(m))
         
         # 使用第一行和第一列作为标记
+        # 用第一列 matrix[i][0] 保存 row_has_zero[i]
+        # 用第一行 matrix[0][j] 保存 col_has_zero[j]
         for i in range(1, m):
             for j in range(1, n):
                 if matrix[i][j] == 0:
@@ -650,8 +653,8 @@ class Solution:
                     matrix[0][j] = 0  # 标记第j列需要变为0
         
         # 根据标记设置0
-        for i in range(1, m):
-            for j in range(1, n):
+        for i in range(1, m):# 跳过第一行，留到最后修改
+            for j in range(1, n):# 跳过第一列，留到最后修改
                 if matrix[i][0] == 0 or matrix[0][j] == 0:
                     matrix[i][j] = 0
         
@@ -662,8 +665,8 @@ class Solution:
         
         # 处理第一列，如果第一列原来存在0，则将第一列全部变为0
         if first_col_has_zero:
-            for i in range(m):
-                matrix[i][0] = 0
+            for row in matrix:
+                row[0] = 0
 ```
 
 ### [54. 螺旋矩阵](https://leetcode.cn/problems/spiral-matrix/description/?envType=study-plan-v2&envId=top-100-liked)
