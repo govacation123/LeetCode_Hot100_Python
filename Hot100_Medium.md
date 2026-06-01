@@ -811,38 +811,38 @@ class Solution:
 ```
 #### 核心思路
 ```
-从矩阵的右上角开始搜索，这样每一步都可以通过比较大小来确定下一步的方向。详细步骤如下：
+如下图所示，我们将矩阵逆时针旋转 45° ，并将其转化为图形式，发现其类似于 二叉搜索树 ，即对于每个元素，其左分支元素更小、右分支元素更大。因此，通过从 “根节点” 开始搜索，遇到比 target 大的元素就向左，反之向右，即可找到目标值 target 。
 
-1. 从右上角开始：我们选择从矩阵的右上角（即第一行的最后一个元素）开始。这个位置有一个特殊的性质：
-    - 如果当前元素比目标值 target 大，我们可以往左移动，因为同一行左边的元素更小。
-    - 如果当前元素比目标值 target 小，我们可以向下移动，因为同一列下面的元素更大。
+<img width="745" height="556" alt="image" src="https://github.com/user-attachments/assets/8b46f84e-b340-4ef7-9a65-136c8443c849" />
 
-2. 不断缩小搜索空间：根据上面的逻辑，我们每次都可以抛弃一整行或一整列，因此每次比较都有效地缩小了搜索范围。
-    
-3. 终止条件：如果找到了目标值，返回 True。如果搜索越界（即行列索引超出矩阵范围），则返回 False，表示未找到目标值。
+
+从矩阵的左下角开始搜索，这样每一步都可以通过比较大小来确定下一步的方向。详细步骤如下：
+
+若 flag > target ，则 target 一定在 flag 所在 行的上方 ，即 flag 所在行可被消去。
+若 flag < target ，则 target 一定在 flag 所在 列的右方 ，即 flag 所在列可被消去。
+算法流程：
+1.从矩阵 matrix 左下角元素（索引设为 (i, j) ）开始遍历，并与目标值对比：
+	当 matrix[i][j] > target 时，执行 i-- ，即消去第 i 行元素。
+	当 matrix[i][j] < target 时，执行 j++ ，即消去第 j 列元素。
+	当 matrix[i][j] = target 时，返回 true ，代表找到目标值。
+2.终止条件：若行索引或列索引越界，则代表矩阵中无目标值，返回 false 。
+
+作者：Krahets
+链接：https://leetcode.cn/problems/search-a-2d-matrix-ii/solutions/2361487/240-sou-suo-er-wei-ju-zhen-iitan-xin-qin-7mtf/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 ```
 #### 代码
 ```python
 class Solution:
     def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
-        # 获取矩阵的行数和列数
-        if not matrix or not matrix[0]:
-            return False
-        rows, cols = len(matrix), len(matrix[0])
-        
-        # 从右上角开始
-        row, col = 0, cols - 1
-        
-        while row < rows and col >= 0:
-            if matrix[row][col] == target:
-                return True
-            elif matrix[row][col] > target:
-                # 如果当前元素比目标大，向左移动
-                col -= 1
-            else:
-                # 如果当前元素比目标小，向下移动
-                row += 1
-        
+		m=len(matrix)//行数
+		n=len(matrix[0])//列数
+        i, j = m-1, 0
+        while i >= 0 and j < n:
+            if matrix[i][j] > target: i -= 1
+            elif matrix[i][j] < target: j += 1
+            else: return True 
         return False
 ```
 
