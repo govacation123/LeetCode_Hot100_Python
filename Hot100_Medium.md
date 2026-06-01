@@ -836,8 +836,8 @@ class Solution:
 ```python
 class Solution:
     def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
-		m=len(matrix)//行数
-		n=len(matrix[0])//列数
+        m = len(matrix)
+        n = len(matrix[0])
         i, j = m-1, 0
         while i >= 0 and j < n:
             if matrix[i][j] > target: i -= 1
