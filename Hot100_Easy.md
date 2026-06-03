@@ -129,23 +129,15 @@ class Solution:
 #### 代码
 ```python
 class Solution:
-    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
-        if not head:
-            return None
-        # 初始化前驱节点和当前节点
-        prev = None
-        current = head
-        # 遍历链表，反转指针
-        while current:
-            next_node = current.next
-            # 反转指针
-            current.next = prev
-            # 移动前驱节点和当前节点
-            prev = current
-            current = next_node
-        
-        # 返回新的头节点（即原链表的最后一个节点）
-        return prev
+    def reverseList(self, head: ListNode) -> ListNode:
+        cur, pre = head, None
+        while cur:
+            tmp = cur.next # 暂存后继节点 cur.next
+            cur.next = pre # 修改 next 引用指向
+            pre = cur      # pre 暂存 cur
+            cur = tmp      # cur 访问下一节点
+        return pre
+
 ```
 
 
@@ -180,32 +172,40 @@ class Solution:
 
 #### 代码
 ```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
 class Solution:
     def isPalindrome(self, head: Optional[ListNode]) -> bool:
-        if not head or not head.next:
-            return True
-        # 步骤一：使用快慢指针寻找到链表中间位置
-        slow, fast = head, head
-        while fast and fast.next:
-            slow = slow.next
-            fast = fast.next.next
-        # 步骤二：对于链表后半部分进行反转
-        def reverseLink(head):
-            prev = None
-            current = head
-            while current:
-                next_node = current.next
-                current.next = prev
-                prev = current
-                current = next_node
-            return prev
-        slow = reverseLink(slow)
-        # 步骤三：判断是否为回文链表
-        while slow:
-            if slow.val != head.val:
+        def middleNode(head:Optional[ListNode])->Optional[ListNode]:
+            slow=fast=head
+            while fast and fast.next:
+                slow=slow.next
+                fast=fast.next.next
+            return slow
+        def reverseList(head:Optional[ListNode])->Optional[ListNode]:
+            cur=head
+            pre=None
+            while cur:
+                tmp=cur.next
+                cur.next=pre
+                pre=cur
+                cur=tmp
+            return pre
+        head1=head
+        mid = middleNode(head)
+        head2 = reverseList(mid)
+
+        while head2:
+            if head1.val!=head2.val:
                 return False
-            slow, head = slow.next, head.next
+            head1=head1.next
+            head2=head2.next
         return True
+
+        
 ```
 
 ### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/description/?envType=study-plan-v2&envId=top-100-liked)
@@ -237,15 +237,53 @@ _如果链表中存在环_ ，则返回 `true` 。 否则，返回 `false` 
 #### 代码
 ```python
 class Solution:
-    def hasCycle(self, head: Optional[ListNode]) -> bool:
-        if not head:
-            return False
-        slow, fast=head, head
-        while slow and fast and fast.next:
-            slow, fast=slow.next, fast.next.next
-            if slow==fast:
-                return True    
-        return False
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+        slow = fast = head  # 乌龟和兔子同时从起点出发
+        while fast and fast.next:
+            slow = slow.next  # 乌龟走一步
+            fast = fast.next.next  # 兔子走两步
+            if fast is slow:  # 兔子追上乌龟（套圈），说明有环
+                return True
+        return False  # 访问到了链表末尾，无环
+
+```
+### [142. 环形链表 II](https://leetcode.cn/problems/linked-list-cycle-ii/description/?envType=study-plan-v2&envId=top-100-liked)
+#### 题目描述
+给定一个链表的头节点  head ，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+
+如果链表中有某个节点，可以通过连续跟踪 next 指针再次到达，则链表中存在环。 为了表示给定链表中的环，评测系统内部使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。如果 pos 是 -1，则在该链表中没有环。注意：pos 不作为参数进行传递，仅仅是为了标识链表的实际情况。
+
+不允许修改 链表。
+示例：
+```
+输入：head = [3,2,0,-4], pos = 1
+输出：返回索引为 1 的链表节点
+解释：链表中有一个环，其尾部连接到第二个节点。
+```
+
+#### 核心思路
+```
+注 1：kc−a 是从入环口开始的步数。由于 (kc−a)+a=kc，所以从 kc−a 开始，再走 a 步，就恰好走了 k 圈，回到入环口。
+
+注 2：慢指针从相遇点开始，移动 a 步后恰好走到入环口，但在这个过程中，可能会多次经过入环口。
+
+注 3：这个算法叫做 Floyd 判圈算法。
+```
+
+#### 代码
+```python
+class Solution:
+    def detectCycle(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        slow = fast = head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            if fast is slow:  # 相遇
+                while slow is not head:  # 再走 a 步
+                    slow = slow.next
+                    head = head.next
+                return slow
+        return None
 ```
 
 ### [21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/description/?envType=study-plan-v2&envId=top-100-liked)
