@@ -951,31 +951,25 @@ class Solution:
 ```python
 class Solution:
     def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
-        # 创建虚拟头节点，用于简化链表操作
-        dummy = ListNode(0)
-        current = dummy
-        carry = 0
-
-        # 遍历两个链表，直到两者都为空
-        while l1 or l2:
-            # 计算当前位的和，考虑进位
-            sum_val = (l1.val if l1 else 0) + (l2.val if l2 else 0) + carry
-            carry = sum_val // 10  # 更新进位
-            current.next = ListNode(sum_val % 10)  # 创建新节点，存储当前位的值
-            current = current.next  # 移动 current 指针到新节点
-
-            # 移动 l1 和 l2 指针到下一个节点
+        cur = dummy = ListNode()  # 哨兵节点
+        carry = 0  # 进位值
+        while l1 or l2 or carry:  # 有一个不是空节点，或者还有进位，就继续迭代
+            s = carry
             if l1:
-                l1 = l1.next
+                s += l1.val  # 节点值和进位加在一起
+                l1 = l1.next  # 下一个节点
             if l2:
-                l2 = l2.next
+                s += l2.val  # 节点值和进位加在一起
+                l2 = l2.next  # 下一个节点
+            cur.next = ListNode(s % 10)  # 每个节点保存一个数位
+            carry = s // 10  # 新的进位
+            cur = cur.next  # 下一个节点
+        return dummy.next  # 哨兵节点的下一个节点就是头节点
 
-        # 如果最后有进位，需要在结果链表的末尾新增一个节点
-        if carry > 0:
-            current.next = ListNode(carry)
-
-        # 返回结果链表的头节点，即虚拟头节点的下一个节点
-        return dummy.next
+作者：灵茶山艾府
+链接：https://leetcode.cn/problems/add-two-numbers/solutions/2327008/dong-hua-jian-ji-xie-fa-cong-di-gui-dao-oe0di/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 ```
 ### [19. 删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/description/?envType=study-plan-v2&envId=top-100-liked)
 #### 题目描述
@@ -1073,30 +1067,15 @@ class Solution:
 ```python
 class Solution:
     def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
-        # 创建虚拟头节点，方便处理链表头部的交换
-        dummy = ListNode(0)
-        dummy.next = head
-        prev = dummy
-        
-        while head and head.next:
-            # 定义需要交换的两个节点
-            first = head
-            second = head.next
-            
-            # 交换节点
-            # 1. 将 prev 的 next 指向 second
-            prev.next = second
-            # 2. 将 first 的 next 指向 second 的 next
-            first.next = second.next
-            # 3. 将 second 的 next 指向 first
-            second.next = first
-            
-            # 更新指针，准备处理下一对节点
-            prev = first
-            head = first.next
-        
-        # 返回新的链表头节点
-        return dummy.next
+        if head is None or head.next is None:
+            return head
+        pre=head
+        cur=head.next
+        next=head.next.next
+
+        cur.next=pre
+        pre.next=self.swapPairs(next)
+        return cur
 ```
 ### [138. 随机链表的复制](https://leetcode.cn/problems/copy-list-with-random-pointer/description/?envType=study-plan-v2&envId=top-100-liked)
 #### 题目描述
