@@ -1102,59 +1102,37 @@ class Solution:
 ```
 #### 核心思路
 ```
-1. 复制每个节点并插入到原节点后面：
-    - 首先遍历原链表，对于每个节点，创建一个新的节点，并将其插入到当前节点和下一个节点之间。这样，原链表 A -> B -> C 变成 A -> A' -> B -> B' -> C -> C'，其中 A', B', C' 是新复制的节点。
+核心思想：用一张哈希表（字典）记录原节点 到 复制出的新节点 的映射关系。
 
-2. 设置新节点的随机指针：
-    - 再次遍历链表，这次设置每个新节点的 random 指针。由于新节点紧跟在原节点后面，原节点的 random 指针指向的节点后面就是新节点的 random 指针应该指向的节点。例如，如果原节点 A 的 random 指针指向 B，那么新节点 A' 的 random 指针应该指向 B'。
+步骤：
 
-3. 分离两个链表：
-    - 最后，我们需要将原链表和新链表分开。遍历链表，将新节点从原链表中分离出来，恢复原链表的结构，同时构建新链表。
+先遍历一遍原链表，为每个原节点创建一个值相同的新节点，并存入哈希表 {原节点: 新节点}。
+再遍历一遍原链表，从哈希表中取出当前节点对应的新节点，以及它的next和random所对应的新节点，然后设置好指向。
 ```
 #### 代码
 ```python
 class Solution:
-    def copyRandomList(self, head: 'Optional[Node]') -> 'Optional[Node]':
-        if not head:
-            return None
+    def copyRandomList(self, head: 'Node') -> 'Node':
+        if not head: return
+        dic = {}
+        #  复制各节点，并建立 “原节点 -> 新节点” 的 Map 映射
+        cur = head
+        while cur:
+            dic[cur] = Node(cur.val)
+            cur = cur.next
+        cur = head
+        #  构建新节点的 next 和 random 指向
+        while cur:
+            dic[cur].next = dic.get(cur.next)
+            dic[cur].random = dic.get(cur.random)
+            cur = cur.next
+        # 返回新链表的头节点
+        return dic[head]
 
-        # Step 1: 创建新节点并插入到原节点后面
-        curr = head
-        while curr:
-            # 创建新节点，并将其值设为当前节点的值
-            new_node = Node(curr.val, curr.next, None)
-            # 将新节点插入到当前节点和下一个节点之间
-            curr.next = new_node
-            # 移动到下一个原节点
-            curr = new_node.next
-
-        # Step 2: 设置新节点的随机指针
-        curr = head
-        while curr:
-            # 如果当前节点有随机指针
-            if curr.random:
-                # 新节点的随机指针应该指向原节点随机指针对应的新节点
-                curr.next.random = curr.random.next
-            # 移动到下一个原节点
-            curr = curr.next.next
-
-        # Step 3: 分离两个链表
-        old_head = head
-        new_head = head.next
-        curr_old = old_head
-        curr_new = new_head
-
-        while curr_old:
-            # 恢复原链表的结构
-            curr_old.next = curr_old.next.next if curr_old.next else None
-            # 构建新链表的结构
-            curr_new.next = curr_new.next.next if curr_new.next else None
-            # 移动到下一个原节点
-            curr_old = curr_old.next
-            # 移动到新链表的下一个新节点
-            curr_new = curr_new.next
-
-        return new_head
+作者：Krahets
+链接：https://leetcode.cn/problems/copy-list-with-random-pointer/solutions/2361362/138-fu-zhi-dai-sui-ji-zhi-zhen-de-lian-b-6jeo/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 ```
 ### [148. 排序链表](https://leetcode.cn/problems/sort-list/description/?envType=study-plan-v2&envId=top-100-liked)
 #### 题目描述
